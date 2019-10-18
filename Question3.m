@@ -25,13 +25,13 @@ for g = 1:28
         %Finding the predicted w (using the math above)
         wpred = inv(sigma2/gamma2(g)*eye(4)+transpose(xall)*xall)*transpose(xall)*y;
         %Finding the ML estimates
-        wml = inv(transpose(xall)*xall)*transpose(xall)*y;
+        %wml = inv(transpose(xall)*xall)*transpose(xall)*y;
         %Calculating error squared
         errorsq(g,i) = (transpose(w)*w-transpose(wpred)*wpred)^2;
         %Calculating ML error squared
-        errorsqml(g,i) = (transpose(w)*w-transpose(wml)*wml)^2;
+        %errorsqml(g,i) = (transpose(w)*w-transpose(wml)*wml)^2;
         %Clearing x, y, v and wpred for the next loop
-        %clear v x y wpred;
+        clear v x y wpred xall x0 x1 x2 x3;
     end
 end
 %Finding minimum, 25th percentile, median, 75th percentile and maximum
@@ -42,14 +42,14 @@ err25 = sorted(:,25);
 errmed = sorted(:,50);
 err75 = sorted(:,75);
 errmax = sorted(:,100);
-
+%{
 sortedml = sort(errorsqml,2);
 errminml = sortedml(:,1);
 err25ml = sortedml(:,25);
 errmedml = sortedml(:,50);
 err75ml = sortedml(:,75);
 errmaxml = sortedml(:,100);
-
+%}
 disp('The minimum errors are:')
 disp(errmin)
 disp('The 25th percentile errors are:')
