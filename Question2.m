@@ -1,14 +1,14 @@
 %Question 2
 
 %Setting seed (to make my work replicable)
-rng(1881)
+rng(3023)
 
 %Defining the landmark locations (for 4,3,2,1 estimates)
 xl = [1,-1,0,0,-1/2,-1/2];
-yl = [0,0,1,-1,sqrt(3)/2,sqrt(3)/2];
+yl = [0,0,1,-1,sqrt(3)/2,-sqrt(3)/2];
 %Defining the random point (randomly)
-xr = 2*rand-1;
-yr = 2*rand-1;
+xr = sqrt(2)*rand-1;
+yr = sqrt(2)*rand-1;
 %Defining measurement noise
 n = normrnd(0,0.3,6,1);
 %Defining measured distances
@@ -19,32 +19,64 @@ end
 horizontalGrid = linspace(-2,2,101);
 verticalGrid = linspace(-2,2,101);
 [h,v] = meshgrid(horizontalGrid,verticalGrid);
-for l = 1:4
-    MAPEstimate = log(evalGaussian([h(:)';v(:)'],mu(:,2),Sigma(:,:,2)))-log(evalGaussian([h(:)';v(:)'],mu(:,1),Sigma(:,:,1))) - log(gamma);
-    minMAP(l) = min(MAPEstimate(l));
-    maxMAP(l) = max(MAPEstimate(l));
-    MAPGrid(l) = reshape(MAPEstimate(l),101,101);
-end
-    
-%Solving for MAP estimates using 1 point (errors)
-%F(1) = ((1-x)(1.0967-sqrt((1-x)^2+(0-y)^2)))/((0.09)sqrt((1-x)^2+(0-y)^2))+x/(0.25); 
-%F(2) = ((0-y)(1.0967-sqrt((1-x)^2+(0-y)^2)))/((0.09)sqrt((1-x)^2+(0-y)^2))+y/(0.25);
-
+MAPEstimate1 = h(:).^2/0.25+v(:).^2/0.25+((r(1)-sqrt((xl(1)-h(:)).^2+(xl(1)-v(:)).^2)).^2)/0.09;
+MAPEstimate2 = h(:).^2/0.25+v(:).^2/0.25+((r(1)-sqrt((xl(1)-h(:)).^2+(xl(1)-v(:)).^2)).^2)/0.09+((r(2)-sqrt((xl(2)-h(:)).^2+(xl(2)-v(:)).^2)).^2)/0.09;
+MAPEstimate3 = h(:).^2/0.25+v(:).^2/0.25+((r(1)-sqrt((xl(1)-h(:)).^2+(xl(1)-v(:)).^2)).^2)/0.09+((r(5)-sqrt((xl(5)-h(:)).^2+(xl(5)-v(:)).^2)).^2)/0.09+((r(6)-sqrt((xl(6)-h(:)).^2+(xl(6)-v(:)).^2)).^2)/0.09;
+MAPEstimate4 = h(:).^2/0.25+v(:).^2/0.25+((r(1)-sqrt((xl(1)-h(:)).^2+(xl(1)-v(:)).^2)).^2)/0.09+((r(2)-sqrt((xl(2)-h(:)).^2+(xl(2)-v(:)).^2)).^2)/0.09+((r(3)-sqrt((xl(3)-h(:)).^2+(xl(3)-v(:)).^2)).^2)/0.09+((r(4)-sqrt((xl(4)-h(:)).^2+(xl(4)-v(:)).^2)).^2)/0.09;
+minMAP(1) = min(MAPEstimate1);
+minMAP(2) = min(MAPEstimate2);
+minMAP(3) = min(MAPEstimate3);
+minMAP(4) = min(MAPEstimate4);
+maxMAP(1) = max(MAPEstimate1);
+maxMAP(2) = max(MAPEstimate2);
+maxMAP(3) = max(MAPEstimate3);
+maxMAP(4) = max(MAPEstimate4);
+MAPGrid1 = reshape(MAPEstimate1,101,101);
+MAPGrid2 = reshape(MAPEstimate2,101,101);
+MAPGrid3 = reshape(MAPEstimate3,101,101);
+MAPGrid4 = reshape(MAPEstimate4,101,101);
 
 %One point
-figure(1), contour(horizontalGrid,verticalGrid,MAPGrid(1),[minMAP(1)*[0.9,0.6,0.3],0,[0.3,0.6,0.9]*maxMAP(1)]) hold on; 
 scatter(xl(1),yl(1),'ob'), hold on,
-scatter(xr,yr,'+r'), hold off
+scatter(xr,yr,'+r'), hold on
+contour(horizontalGrid,verticalGrid,MAPGrid1,[minMAP(1)*[1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1],0,[0.3,0.6,0.9,1]*maxMAP(1)]); 
+legend('Reference Points','Actual Point','MAP Grid'), 
+title('MAP Estimator Contour Plots with One Reference Point'),
+xlabel('x'), ylabel('y')
+hold off
+
+saveas(gcf,'Q21.png')
+
 %Two points
-figure(2), contour(horizontalGrid,verticalGrid,MAPGrid(2),[minMAP(2)*[0.9,0.6,0.3],0,[0.3,0.6,0.9]*maxMAP(2)]) hold on;
 scatter(xl(1:2),yl(1:2),'ob'), hold on,
-scatter(xr,yr,'+r'), hold off
+scatter(xr,yr,'+r'), hold on
+contour(horizontalGrid,verticalGrid,MAPGrid2,[minMAP(2)*[1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1],0,[0.3,0.6,0.9,1]*maxMAP(2)]);
+legend('Reference Points','Actual Point','MAP Grid'), 
+title('MAP Estimator Contour Plots with Two Reference Points'),
+xlabel('x'), ylabel('y')
+hold off
+
+saveas(gcf,'Q22.png')
+
 %Three points
-figure(3), contour(horizontalGrid,verticalGrid,MAPGrid(3),[minMAP(3)*[0.9,0.6,0.3],0,[0.3,0.6,0.9]*maxMAP(3)]) hold on; 
 scatter(xl(1),yl(1),'ob'), hold on,
 scatter(xl(5:6),yl(5:6),'ob'), hold on,
-scatter(xr,yr,'+r'), hold off
+scatter(xr,yr,'+r'), hold on
+contour(horizontalGrid,verticalGrid,MAPGrid3,[minMAP(3)*[1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1],0,[0.3,0.6,0.9,1]*maxMAP(3)]);
+legend('Reference Points','Reference Points','Actual Point','MAP Grid'), 
+title('MAP Estimator Contour Plots with Three Reference Points'),
+xlabel('x'), ylabel('y')
+hold off
+
+saveas(gcf,'Q23.png')
+
 %Four points
-figure(4), contour(horizontalGrid,verticalGrid,MAPGrid(4),[minMAP(4)*[0.9,0.6,0.3],0,[0.3,0.6,0.9]*maxMAP(4)]) hold on; 
 scatter(xl(1:4),yl(1:4),'ob'), hold on,
-scatter(xr,yr,'+r'), hold off
+scatter(xr,yr,'+r'), hold on,
+contour(horizontalGrid,verticalGrid,MAPGrid4,[minMAP(4)*[1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1],0,[0.3,0.6,0.9,1]*maxMAP(4)]);
+legend('Reference Points','Actual Point','MAP Grid'), 
+title('MAP Estimator Contour Plots with Four Reference Points'),
+xlabel('x'), ylabel('y')
+hold off
+
+saveas(gcf,'Q24.png')
